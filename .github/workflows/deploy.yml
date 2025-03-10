@@ -1,8 +1,6 @@
 name: Deploy
 
 
-# Quando é pra executar
-=======
 on:
   push:
     branches: [ "main" ]
