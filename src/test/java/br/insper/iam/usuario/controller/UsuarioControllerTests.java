@@ -1,5 +1,6 @@
 package br.insper.iam.usuario.controller;
 
+import br.insper.iam.usuario.CountUsuarioDTO;
 import br.insper.iam.usuario.Usuario;
 import br.insper.iam.usuario.UsuarioController;
 import br.insper.iam.usuario.UsuarioService;
@@ -12,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -41,18 +43,52 @@ public class UsuarioControllerTests {
     }
 
     @Test
-    void testGetUsuarios() throws Exception {
+    void test_GetUsuarios() throws Exception {
         List<Usuario> usuarios = Arrays.asList(
-                new Usuario("João", "joao@example.com"),
-                new Usuario("Maria", "maria@example.com")
+                new Usuario("João", "joao@example.com", "ADMIN"),
+                new Usuario("Maria", "maria@example.com", "ADMIN")
         );
 
-        ObjectMapper objectMapper = new ObjectMapper();
 
         Mockito.when(usuarioService.getUsuarios()).thenReturn(usuarios);
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/usuario"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(usuarios)));
+    }
+
+    @Test
+    void test_PostUsuario() throws Exception {
+        Usuario usuario = new Usuario();
+        usuario.setNome("Teste");
+        usuario.setEmail("teste@teste.com");
+
+        Mockito.when(usuarioService.saveUsuario(usuario))
+                .thenReturn(usuario);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        mockMvc.perform(
+                    MockMvcRequestBuilders.post("/api/usuario")
+                            .content(objectMapper.writeValueAsString(usuario))
+                            .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(usuario)));
+
+    }
+
+
+    @Test
+    void test_CountUsuarios() throws Exception {
+
+        CountUsuarioDTO countUsuarioDTO = new CountUsuarioDTO(5L);
+
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/usuario/count"))
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }
