@@ -52,6 +52,7 @@ jobs:
           docker stop usuario
           docker rm --force usuario
 
+
           docker run -d -p 8080:8080 \
             -e sprint_profiles_active=git \
             -e USER_DB=${{ secrets.USER_DB }} \
